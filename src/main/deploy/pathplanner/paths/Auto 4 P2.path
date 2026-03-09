@@ -3,41 +3,36 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 1.9558846153846168,
-        "y": 1.9419230769230773
+        "x": 7.785836298932384,
+        "y": 0.974009489916964
       },
       "prevControl": null,
       "nextControl": {
-        "x": 0.781435897435899,
-        "y": 1.127948717948719
+        "x": 7.796595492289443,
+        "y": 2.42650059311981
       },
       "isLocked": false,
-      "linkedName": "A1 P4 + P5"
+      "linkedName": "A4 P1+P2"
     },
     {
       "anchor": {
-        "x": 1.072141025641027,
-        "y": 2.895435897435898
+        "x": 7.785836298932384,
+        "y": 3.674567022538553
       },
       "prevControl": {
-        "x": 1.2000512820512834,
-        "y": 1.6395897435897437
+        "x": 7.839632265717675,
+        "y": 2.889145907473309
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": null
+      "linkedName": "A4 P2+P3"
     }
   ],
-  "rotationTargets": [
-    {
-      "waypointRelativePos": 0.49649122807017504,
-      "rotationDegrees": -90.0
-    }
-  ],
+  "rotationTargets": [],
   "constraintZones": [
     {
       "name": "Constraints Zone",
-      "minWaypointRelativePos": 0.48726467331118195,
+      "minWaypointRelativePos": 0,
       "maxWaypointRelativePos": 1.0,
       "constraints": {
         "maxVelocity": 1.0,
@@ -50,7 +45,14 @@
     }
   ],
   "pointTowardsZones": [],
-  "eventMarkers": [],
+  "eventMarkers": [
+    {
+      "name": "IntakeBalls",
+      "waypointRelativePos": 0,
+      "endWaypointRelativePos": 1.0,
+      "command": null
+    }
+  ],
   "globalConstraints": {
     "maxVelocity": 3.0,
     "maxAcceleration": 7.0,
@@ -61,13 +63,13 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": -90.0
+    "rotation": 88.23760897633942
   },
   "reversed": false,
-  "folder": "Auto 1",
+  "folder": "Auto 4",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": 38.88449643371462
+    "rotation": 90.0
   },
   "useDefaultConstraints": true
 }

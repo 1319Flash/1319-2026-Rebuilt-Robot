@@ -3,42 +3,46 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 4.397807692307693,
-        "y": 6.011794871794872
+        "x": 0.5018623962040341,
+        "y": 0.6727520759193351
       },
       "prevControl": null,
       "nextControl": {
-        "x": 8.049064102564099,
-        "y": 4.988512820512822
+        "x": 1.501862396204034,
+        "y": 0.6727520759193348
       },
       "isLocked": false,
-      "linkedName": null
+      "linkedName": "A3 P1+P2"
     },
     {
       "anchor": {
-        "x": 7.711846153846155,
-        "y": 7.058333333333334
+        "x": 2.5999051008357474,
+        "y": 2.7492763938261735
       },
       "prevControl": {
-        "x": 4.490833333333335,
-        "y": 8.081615384615382
+        "x": 1.8360023724900003,
+        "y": 2.351186239609643
       },
       "nextControl": null,
-      "isLocked": true,
-      "linkedName": "P4+P5"
+      "isLocked": false,
+      "linkedName": "A3 P2+P3"
     }
   ],
   "rotationTargets": [],
   "constraintZones": [],
-  "pointTowardsZones": [],
-  "eventMarkers": [
+  "pointTowardsZones": [
     {
-      "name": "ExtendIntake",
-      "waypointRelativePos": 0.571428571428564,
-      "endWaypointRelativePos": null,
-      "command": null
+      "fieldPosition": {
+        "x": 4.612,
+        "y": 3.997
+      },
+      "rotationOffset": 0.0,
+      "minWaypointRelativePos": 0.22947131608548937,
+      "maxWaypointRelativePos": 1.0,
+      "name": "Point Towards Zone"
     }
   ],
+  "eventMarkers": [],
   "globalConstraints": {
     "maxVelocity": 3.0,
     "maxAcceleration": 7.0,
@@ -49,10 +53,10 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": -90.0
+    "rotation": 33.11134196037215
   },
   "reversed": false,
-  "folder": "Auto 2",
+  "folder": "Auto 3",
   "idealStartingState": {
     "velocity": 0,
     "rotation": 0.0

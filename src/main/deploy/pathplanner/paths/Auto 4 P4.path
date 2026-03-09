@@ -3,25 +3,25 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 1.9558846153846168,
-        "y": 1.9419230769230773
+        "x": 2.234092526690392,
+        "y": 2.469537366548043
       },
       "prevControl": null,
       "nextControl": {
-        "x": 0.781435897435899,
-        "y": 1.127948717948719
+        "x": 1.1796915776986956,
+        "y": 0.29618030842230203
       },
       "isLocked": false,
-      "linkedName": "A1 P4 + P5"
+      "linkedName": "A4 P3+P4"
     },
     {
       "anchor": {
-        "x": 1.072141025641027,
-        "y": 2.895435897435898
+        "x": 1.0505812574139983,
+        "y": 2.9106642941874257
       },
       "prevControl": {
-        "x": 1.2000512820512834,
-        "y": 1.6395897435897437
+        "x": 0.8999525504151842,
+        "y": 0.29618030842230203
       },
       "nextControl": null,
       "isLocked": false,
@@ -30,14 +30,14 @@
   ],
   "rotationTargets": [
     {
-      "waypointRelativePos": 0.49649122807017504,
+      "waypointRelativePos": 0.5,
       "rotationDegrees": -90.0
     }
   ],
   "constraintZones": [
     {
       "name": "Constraints Zone",
-      "minWaypointRelativePos": 0.48726467331118195,
+      "minWaypointRelativePos": 0.3307086614173184,
       "maxWaypointRelativePos": 1.0,
       "constraints": {
         "maxVelocity": 1.0,
@@ -61,13 +61,13 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": -90.0
+    "rotation": -90.84252426074042
   },
   "reversed": false,
-  "folder": "Auto 1",
+  "folder": "Auto 4",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": 38.88449643371462
+    "rotation": 32.574057134572364
   },
   "useDefaultConstraints": true
 }

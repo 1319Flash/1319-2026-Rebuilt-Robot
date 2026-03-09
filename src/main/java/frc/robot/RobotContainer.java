@@ -109,6 +109,9 @@ public class RobotContainer {
             climberSubsystem.toggleCommand()
         );
         
+        NamedCommands.registerCommand("Dump",
+           intakeSubsystem.reverseCommand());
+
         NamedCommands.registerCommand("ExtendIntake",
             intakeSubsystem.extendCommand()
         );
@@ -217,8 +220,12 @@ public class RobotContainer {
             .onTrue(intakeSubsystem.runCommand())
             .onFalse(intakeSubsystem.stopCommand());
 
-        // Operator select (back) button — toggle intake deploy/retract
         m_operatorController.back()
+                .onTrue(intakeSubsystem.reverseCommand())
+                .onFalse(intakeSubsystem.stopCommand());
+
+        // Operator select (back) button — toggle intake deploy/retract
+        m_operatorController.povUp()
             .onTrue(intakeSubsystem.toggleCommand());
 
 
