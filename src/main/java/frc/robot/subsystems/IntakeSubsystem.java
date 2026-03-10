@@ -20,7 +20,7 @@ public class IntakeSubsystem extends SubsystemBase {
     private static final String kCanBus             = "";
     private static final double kIntakeSpeed        = 1.0;
 
-    // Pneumatic channel IDs on the REV PH
+    // Pneumatic channel IDs on the CTRE PCM
     private static final int kSolenoidForwardChannel = 2;
     private static final int kSolenoidReverseChannel = 3;
 
@@ -30,7 +30,7 @@ public class IntakeSubsystem extends SubsystemBase {
 
     public IntakeSubsystem() {
         m_intakeMotor = new TalonFX(kIntakeMotorId, kCanBus);
-        m_intakeSolenoid = new DoubleSolenoid(PneumaticsModuleType.REVPH, kSolenoidForwardChannel, kSolenoidReverseChannel);
+        m_intakeSolenoid = new DoubleSolenoid(PneumaticsModuleType.CTREPCM, kSolenoidForwardChannel, kSolenoidReverseChannel);
 
         // Start retracted
         m_intakeSolenoid.set(Value.kReverse);
