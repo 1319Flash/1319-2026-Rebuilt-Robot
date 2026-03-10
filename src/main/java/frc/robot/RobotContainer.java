@@ -13,6 +13,8 @@ import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.commands.FollowPathCommand;
 
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.Compressor;
+import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -75,12 +77,14 @@ public class RobotContainer {
     private final SendableChooser<Command> m_autoChooser;
 
     public RobotContainer() {
+        // Clear any sticky faults on the CTRE PCM
+        new Compressor(PneumaticsModuleType.CTREPCM).clearAllStickyFaults();
+
         limelightSubsystem.setDrivetrain(drivetrain);
 
         NamedCommands.registerCommand("ShootClose",
             Commands.sequence(
                 flyWheelSubsystem.shootAtVelocity(42.5),
-                flyWheelSubsystem.waitUntilAtSpeed(),
                 Commands.deadline(
                     Commands.waitSeconds(5.0),
                     uptakeSubsystem.runCommand()
@@ -94,7 +98,6 @@ public class RobotContainer {
         NamedCommands.registerCommand("ShootFar",
             Commands.sequence(
                 flyWheelSubsystem.shootAtVelocity(65.0),
-                flyWheelSubsystem.waitUntilAtSpeed(),
                 Commands.deadline(
                     Commands.waitSeconds(5.0),
                     uptakeSubsystem.runCommand()
@@ -104,6 +107,14 @@ public class RobotContainer {
                     uptakeSubsystem.stopCommand()
                 )
             )
+        );
+
+        NamedCommands.registerCommand("RevShooterClose",
+            flyWheelSubsystem.shootAtVelocity(42.5)
+        );
+
+        NamedCommands.registerCommand("RevShooterFar",
+            flyWheelSubsystem.shootAtVelocity(65.0)
         );
         NamedCommands.registerCommand("Climb",
             climberSubsystem.toggleCommand()
