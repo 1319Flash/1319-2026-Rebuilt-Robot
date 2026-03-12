@@ -5,6 +5,7 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
 import edu.wpi.first.wpilibj.DoubleSolenoid;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -28,6 +29,18 @@ public class IntakeSubsystem extends SubsystemBase {
     // Current limits to protect the motor during jams
     private static final double kStatorCurrentLimit = 40.0;
     private static final double kSupplyCurrentLimit = 30.0;
+
+    // Jam detection — motor is considered jammed if velocity stays below
+    // threshold while running for longer than kJamTimeSeconds
+    private static final double kJamVelocityThresholdRps = 1.0;  // tune: watch Intake/Velocity while running normally
+    private static final double kJamTimeSeconds           = 0.3;  // how long near-zero velocity before declaring a jam
+    private static final double kEjectTimeSeconds         = 0.5;  // how long to reverse to clear the jam
+
+    private enum IntakeState { STOPPED, RUNNING, EJECTING }
+
+    private IntakeState m_intakeState = IntakeState.STOPPED;
+    private double      m_jamTimer    = 0.0;
+    private double      m_ejectTimer  = 0.0;
 
     public IntakeSubsystem() {
         m_intakeMotor = new TalonFX(kIntakeMotorId, kCanBus);
@@ -58,7 +71,44 @@ public class IntakeSubsystem extends SubsystemBase {
 
     @Override
     public void periodic() {
-        SmartDashboard.putBoolean("Intake State", getIntakeDoubleSolenoidState());
+        double velocity = Math.abs(m_intakeMotor.getVelocity().getValueAsDouble());
+
+        switch (m_intakeState) {
+            case RUNNING:
+                if (velocity < kJamVelocityThresholdRps) {
+                    m_jamTimer += 0.020;
+                    if (m_jamTimer >= kJamTimeSeconds) {
+                        // Jammed — reverse to eject
+                        m_intakeState = IntakeState.EJECTING;
+                        m_jamTimer    = 0.0;
+                        m_ejectTimer  = 0.0;
+                        m_intakeMotor.set(-kIntakeSpeed);
+                    }
+                } else {
+                    m_jamTimer = 0.0; // velocity is healthy, reset timer
+                }
+                break;
+
+            case EJECTING:
+                m_ejectTimer += 0.020;
+                if (m_ejectTimer >= kEjectTimeSeconds) {
+                    // Ejection done — resume intake
+                    m_intakeState = IntakeState.RUNNING;
+                    m_ejectTimer  = 0.0;
+                    m_jamTimer    = 0.0;
+                    m_intakeMotor.set(kIntakeSpeed);
+                }
+                break;
+
+            case STOPPED:
+            default:
+                break;
+        }
+
+        SmartDashboard.putBoolean("Intake/Extended", getIntakeDoubleSolenoidState());
+        SmartDashboard.putBoolean("Intake/Jammed",   m_intakeState == IntakeState.EJECTING);
+        SmartDashboard.putString("Intake/State",     m_intakeState.toString());
+        SmartDashboard.putNumber("Intake/Velocity",  velocity);
     }
 
     public void setSpeed(double speed) {
@@ -89,23 +139,45 @@ public class IntakeSubsystem extends SubsystemBase {
         return Commands.runOnce(() -> m_intakeSolenoid.set(Value.kReverse), this);
     }
 
-    /** Runs the intake at full speed to pick up balls. */
+    /** Runs the intake at full speed with jam detection active. */
     public Command runCommand() {
-        return runOnce(() -> setSpeed(kIntakeSpeed));
+        return startEnd(
+            () -> {
+                m_intakeState = IntakeState.RUNNING;
+                m_jamTimer    = 0.0;
+                m_intakeMotor.set(kIntakeSpeed);
+            },
+            () -> {
+                m_intakeState = IntakeState.STOPPED;
+                m_intakeMotor.set(0);
+            }
+        );
     }
 
-    /** Stops the intake. */
+    /** Stops the intake and cancels any active jam ejection. */
     public Command stopCommand() {
-        return runOnce(this::stop);
+        return runOnce(() -> {
+            m_intakeState = IntakeState.STOPPED;
+            stop();
+        });
     }
 
-    /** Runs the intake at a custom speed. */
+    /** Runs the intake at a custom speed. Jam detection is not active. */
     public Command runAtSpeed(double speed) {
         return runOnce(() -> setSpeed(speed));
     }
 
-    /** Reverses the intake for unjamming. */
+    /** Manually reverses the intake for unjamming. */
     public Command reverseCommand() {
-        return runOnce(() -> setSpeed(-kIntakeSpeed));
+        return startEnd(
+            () -> {
+                m_intakeState = IntakeState.EJECTING;
+                m_intakeMotor.set(-kIntakeSpeed);
+            },
+            () -> {
+                m_intakeState = IntakeState.STOPPED;
+                m_intakeMotor.set(0);
+            }
+        );
     }
 }

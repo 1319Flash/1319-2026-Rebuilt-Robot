@@ -80,6 +80,7 @@ public class RobotContainer {
         NamedCommands.registerCommand("ShootClose",
             Commands.sequence(
                 flyWheelSubsystem.shootAtVelocity(42.5),
+                flyWheelSubsystem.waitUntilAtSpeed(),
                 Commands.deadline(
                     Commands.waitSeconds(5.0),
                     uptakeSubsystem.runCommand()
@@ -90,9 +91,14 @@ public class RobotContainer {
                 )
             )
         );
+
+        NamedCommands.registerCommand("SpinUp",
+            flyWheelSubsystem.shootAtVelocity(60.0) // change RPS per shot position
+        );
+
         NamedCommands.registerCommand("ShootFar",
             Commands.sequence(
-                flyWheelSubsystem.shootAtVelocity(65.0),
+                flyWheelSubsystem.waitUntilAtSpeed(),
                 Commands.deadline(
                     Commands.waitSeconds(5.0),
                     uptakeSubsystem.runCommand()
@@ -104,13 +110,6 @@ public class RobotContainer {
             )
         );
 
-        NamedCommands.registerCommand("RevShooterClose",
-            flyWheelSubsystem.shootAtVelocity(42.5)
-        );
-
-        NamedCommands.registerCommand("RevShooterFar",
-            flyWheelSubsystem.shootAtVelocity(65.0)
-        );
         NamedCommands.registerCommand("Climb",
             climberSubsystem.toggleCommand()
         );
@@ -124,7 +123,7 @@ public class RobotContainer {
 
         NamedCommands.registerCommand("RunIntake",
             Commands.startEnd(
-                () -> intakeSubsystem.setSpeed(1.0),
+                () -> intakeSubsystem.setSpeed(.67),
                 () -> intakeSubsystem.stop(),
                 intakeSubsystem
             )
