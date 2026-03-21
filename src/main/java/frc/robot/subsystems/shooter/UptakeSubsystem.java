@@ -23,7 +23,7 @@ public class UptakeSubsystem extends SubsystemBase {
     private static final int    kUptakeMotorId      = 10;
     private static final String kCanBus             = "";
 
-    private static final double kUptakeSpeed        = 1.0;
+    private static final double kUptakeSpeed        = -1.0;
 
     // High stator limit to maximize torque through the uptake mechanism
     // Lower to 60A if the motor runs hot or gearbox shows stress

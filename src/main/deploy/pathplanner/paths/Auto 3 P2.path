@@ -3,13 +3,13 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 0.395590909090909,
-        "y": 0.6543636363636369
+        "x": 0.5556583629893244,
+        "y": 0.6081969157769855
       },
       "prevControl": null,
       "nextControl": {
-        "x": 1.395590909090909,
-        "y": 0.6543636363636367
+        "x": 1.5556583629893244,
+        "y": 0.6081969157769853
       },
       "isLocked": false,
       "linkedName": "A3 P1+P2"
@@ -24,7 +24,7 @@
         "y": 2.351186239609643
       },
       "nextControl": null,
-      "isLocked": true,
+      "isLocked": false,
       "linkedName": "A3 P2+P3"
     }
   ],
@@ -37,7 +37,7 @@
         "y": 3.997
       },
       "rotationOffset": 0.0,
-      "minWaypointRelativePos": 0.22947131608548937,
+      "minWaypointRelativePos": 0.4386951631046044,
       "maxWaypointRelativePos": 1.0,
       "name": "Point Towards Zone"
     }
@@ -45,13 +45,13 @@
   "eventMarkers": [
     {
       "name": "SpinUp",
-      "waypointRelativePos": 0.7,
+      "waypointRelativePos": 0.75,
       "endWaypointRelativePos": 1.0,
       "command": null
     }
   ],
   "globalConstraints": {
-    "maxVelocity": 3.0,
+    "maxVelocity": 2.0,
     "maxAcceleration": 7.0,
     "maxAngularVelocity": 540.0,
     "maxAngularAcceleration": 720.0,
@@ -66,7 +66,7 @@
   "folder": "Auto 3",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": 0.0
+    "rotation": 178.57679515336687
   },
   "useDefaultConstraints": true
 }

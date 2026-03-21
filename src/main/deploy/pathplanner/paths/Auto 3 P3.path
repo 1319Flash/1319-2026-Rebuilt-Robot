@@ -3,25 +3,25 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 2.6,
-        "y": 2.749
+        "x": 2.5999051008357474,
+        "y": 2.7492763938261735
       },
       "prevControl": null,
       "nextControl": {
-        "x": 0.9753792095837743,
-        "y": 0.2851332436755647
+        "x": 0.9752669039145911,
+        "y": 0.2854211150652417
       },
       "isLocked": false,
       "linkedName": "A3 P2+P3"
     },
     {
       "anchor": {
-        "x": 1.094,
-        "y": 2.9
+        "x": 0.9967852906287076,
+        "y": 3.0720521945432973
       },
       "prevControl": {
-        "x": 1.1370467097411312,
-        "y": 0.24247940174255245
+        "x": 1.0398220640569407,
+        "y": 0.41453143535531956
       },
       "nextControl": null,
       "isLocked": false,
@@ -52,7 +52,7 @@
   "pointTowardsZones": [],
   "eventMarkers": [],
   "globalConstraints": {
-    "maxVelocity": 3.0,
+    "maxVelocity": 2.0,
     "maxAcceleration": 7.0,
     "maxAngularVelocity": 540.0,
     "maxAngularAcceleration": 720.0,

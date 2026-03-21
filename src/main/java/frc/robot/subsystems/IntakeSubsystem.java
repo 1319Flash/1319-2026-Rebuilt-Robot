@@ -21,7 +21,7 @@ public class IntakeSubsystem extends SubsystemBase {
     private static final int    kIntakeMotorId           = 9;
     private static final String kCanBus                  = "";
 
-    private static final double kIntakeSpeed             = 1.0;
+    private static final double kIntakeSpeed             = -1.0;
 
     // Pneumatic channel IDs on the REV PH
     private static final int    kSolenoidForwardChannel  = 2;

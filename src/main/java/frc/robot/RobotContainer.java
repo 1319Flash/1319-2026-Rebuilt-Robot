@@ -275,7 +275,7 @@ public class RobotContainer {
         m_operatorController.rightBumper()
             .onTrue(
                 Commands.sequence(
-                    flywheelSubsystem.shootAtVelocity(50.0),
+                    flywheelSubsystem.shootAtVelocity(60.0),
                     flywheelSubsystem.waitUntilAtSpeed(),
                     uptakeSubsystem.runCommand()
                 )

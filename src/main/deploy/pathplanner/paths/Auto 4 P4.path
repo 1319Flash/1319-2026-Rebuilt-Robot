@@ -3,13 +3,13 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 2.6,
-        "y": 2.749
+        "x": 2.234092526690392,
+        "y": 2.469537366548043
       },
       "prevControl": null,
       "nextControl": {
-        "x": 1.2702451761332554,
-        "y": 0.7323209547023382
+        "x": 1.1796915776986956,
+        "y": 0.29618030842230203
       },
       "isLocked": false,
       "linkedName": "A4 P3+P4"
@@ -24,7 +24,7 @@
         "y": 0.29618030842230203
       },
       "nextControl": null,
-      "isLocked": true,
+      "isLocked": false,
       "linkedName": null
     }
   ],
@@ -52,7 +52,7 @@
   "pointTowardsZones": [],
   "eventMarkers": [],
   "globalConstraints": {
-    "maxVelocity": 3.0,
+    "maxVelocity": 2.0,
     "maxAcceleration": 7.0,
     "maxAngularVelocity": 540.0,
     "maxAngularAcceleration": 720.0,

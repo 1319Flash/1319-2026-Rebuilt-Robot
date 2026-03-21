@@ -4,6 +4,7 @@ import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.MotorAlignmentValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
@@ -91,6 +92,7 @@ public class FlywheelSubsystem extends SubsystemBase {
         config.CurrentLimits.StatorCurrentLimitEnable = true;
         config.CurrentLimits.SupplyCurrentLimit       = kSupplyCurrentLimit;
         config.CurrentLimits.SupplyCurrentLimitEnable = true;
+        config.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
 
         m_shooterMotor1.getConfigurator().apply(config);
 

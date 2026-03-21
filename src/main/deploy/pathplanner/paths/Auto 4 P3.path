@@ -4,27 +4,27 @@
     {
       "anchor": {
         "x": 7.785836298932384,
-        "y": 3.6845681818181824
+        "y": 3.674567022538553
       },
       "prevControl": null,
       "nextControl": {
         "x": 5.386536180308424,
-        "y": 1.9308196646177076
+        "y": 1.9208185053380782
       },
       "isLocked": false,
       "linkedName": "A4 P2+P3"
     },
     {
       "anchor": {
-        "x": 2.6,
-        "y": 2.749
+        "x": 2.234092526690392,
+        "y": 2.469537366548043
       },
       "prevControl": {
-        "x": 2.6103340902980485,
-        "y": 2.111017259937629
+        "x": 2.8688849347568204,
+        "y": 2.5340925266903924
       },
       "nextControl": null,
-      "isLocked": true,
+      "isLocked": false,
       "linkedName": "A4 P3+P4"
     }
   ],
@@ -42,16 +42,9 @@
       "name": "Point Towards Zone"
     }
   ],
-  "eventMarkers": [
-    {
-      "name": "SpinUp",
-      "waypointRelativePos": 0.655080213903743,
-      "endWaypointRelativePos": 1.0,
-      "command": null
-    }
-  ],
+  "eventMarkers": [],
   "globalConstraints": {
-    "maxVelocity": 3.0,
+    "maxVelocity": 2.0,
     "maxAcceleration": 7.0,
     "maxAngularVelocity": 540.0,
     "maxAngularAcceleration": 720.0,

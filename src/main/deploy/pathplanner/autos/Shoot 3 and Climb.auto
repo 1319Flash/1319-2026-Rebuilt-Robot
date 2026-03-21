@@ -1,0 +1,67 @@
+{
+  "version": "2025.0",
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "named",
+          "data": {
+            "name": "ShootClose"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Auto 1 P1"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Auto 1 P2"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "ShootFar"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Auto 1 P3"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Auto 1 P4"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "ShootFar"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Auto 1 P5"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Climb"
+          }
+        }
+      ]
+    }
+  },
+  "resetOdom": true,
+  "folder": null,
+  "choreoAuto": false
+}
