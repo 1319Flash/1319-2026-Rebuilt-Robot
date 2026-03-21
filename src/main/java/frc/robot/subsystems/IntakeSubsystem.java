@@ -61,6 +61,7 @@ public class IntakeSubsystem extends SubsystemBase {
     @Override
     public void periodic() {
         SmartDashboard.putBoolean("Intake/Extended", isExtended());
+        SmartDashboard.putNumber("Intake/Velocity", getVelocity());
     }
 
     // =========================================================================
@@ -82,6 +83,10 @@ public class IntakeSubsystem extends SubsystemBase {
     /** Returns true if the intake cylinder is currently extended (deployed). */
     public boolean isExtended() {
         return m_intakeSolenoid.get() == Value.kForward;
+    }
+
+    public double getVelocity() {
+        return m_intakeMotor.getVelocity().getValueAsDouble();
     }
 
     // =========================================================================
