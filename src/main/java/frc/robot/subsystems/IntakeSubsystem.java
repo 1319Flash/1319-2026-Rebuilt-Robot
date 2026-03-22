@@ -21,15 +21,15 @@ public class IntakeSubsystem extends SubsystemBase {
     private static final int    kIntakeMotorId           = 9;
     private static final String kCanBus                  = "";
 
-    private static final double kIntakeSpeed             = -1.0;
+    private static final double kIntakeSpeed             = -0.80;
 
     // Pneumatic channel IDs on the REV PH
     private static final int    kSolenoidForwardChannel  = 2;
     private static final int    kSolenoidReverseChannel  = 3;
 
     // Current limits — protect motor during stall
-    private static final double kStatorCurrentLimit      = 40.0;
-    private static final double kSupplyCurrentLimit      = 30.0;
+    private static final double kStatorCurrentLimit      = 80.0;
+    private static final double kSupplyCurrentLimit      = 40.0;
 
     public IntakeSubsystem() {
         m_intakeMotor    = new TalonFX(kIntakeMotorId, kCanBus);

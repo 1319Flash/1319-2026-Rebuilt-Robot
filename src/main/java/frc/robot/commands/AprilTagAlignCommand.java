@@ -18,12 +18,12 @@ public class AprilTagAlignCommand extends Command {
     private static final double kJoystickDeadband = 0.1;
 
     private final CommandSwerveDrivetrain m_drivetrain;
-    private final LimelightSubsystem m_limelight;
-    private final DoubleSupplier m_forwardSupplier;
-    private final DoubleSupplier m_strafeSupplier;
-    private final DoubleSupplier m_speedMultiplierSupplier;
-    private final double m_maxSpeed;
-    private final double m_maxAngularRate;
+    private final LimelightSubsystem      m_limelight;
+    private final DoubleSupplier          m_forwardSupplier;
+    private final DoubleSupplier          m_strafeSupplier;
+    private final DoubleSupplier          m_speedMultiplierSupplier;
+    private final double                  m_maxSpeed;
+    private final double                  m_maxAngularRate;
 
     private final SwerveRequest.RobotCentric m_robotCentricRequest;
 
@@ -36,12 +36,12 @@ public class AprilTagAlignCommand extends Command {
         double maxAngularRate,
         DoubleSupplier speedMultiplierSupplier
     ) {
-        m_drivetrain = drivetrain;
-        m_limelight = limelight;
-        m_forwardSupplier = forwardSupplier;
-        m_strafeSupplier = strafeSupplier;
-        m_maxSpeed = maxSpeed;
-        m_maxAngularRate = maxAngularRate;
+        m_drivetrain              = drivetrain;
+        m_limelight               = limelight;
+        m_forwardSupplier         = forwardSupplier;
+        m_strafeSupplier          = strafeSupplier;
+        m_maxSpeed                = maxSpeed;
+        m_maxAngularRate          = maxAngularRate;
         m_speedMultiplierSupplier = speedMultiplierSupplier;
 
         m_robotCentricRequest = new SwerveRequest.RobotCentric()
@@ -52,12 +52,12 @@ public class AprilTagAlignCommand extends Command {
 
     @Override
     public void initialize() {
-        m_limelight.setFrontLEDsOn();
+        m_limelight.setLEDsOn();
     }
 
     @Override
     public void execute() {
-        double rotationalRate = m_limelight.calculateAimVelocity(m_maxAngularRate);
+        double rotationalRate  = m_limelight.calculateAimVelocity(m_maxAngularRate);
         double speedMultiplier = m_speedMultiplierSupplier.getAsDouble();
 
         double forwardSpeed = -MathUtil.applyDeadband(m_forwardSupplier.getAsDouble(), kJoystickDeadband)
@@ -76,7 +76,7 @@ public class AprilTagAlignCommand extends Command {
 
     @Override
     public void end(boolean interrupted) {
-        m_limelight.setFrontLEDsOff();
+        m_limelight.setLEDsOff();
         m_drivetrain.setControl(
             m_robotCentricRequest
                 .withVelocityX(0)

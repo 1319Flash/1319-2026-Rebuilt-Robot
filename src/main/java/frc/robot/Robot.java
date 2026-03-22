@@ -2,8 +2,6 @@ package frc.robot;
 
 import com.ctre.phoenix6.SignalLogger;
 
-import edu.wpi.first.cameraserver.CameraServer;
-import edu.wpi.first.cscore.UsbCamera;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -33,16 +31,6 @@ public class Robot extends TimedRobot {
     public void robotInit() {
         m_robotContainer = new RobotContainer();
 
-        // Front USB camera — viewed in Elastic driver camera feed
-        UsbCamera frontCamera = CameraServer.startAutomaticCapture("Front Camera", 0);
-        frontCamera.setResolution(320, 240);
-        frontCamera.setFPS(15);
-
-        // Uncomment if a second USB camera is added
-        // UsbCamera backCamera = CameraServer.startAutomaticCapture("Back Camera", 1);
-        // backCamera.setResolution(320, 240);
-        // backCamera.setFPS(15);
-
         startSignalLogger();
     }
 
@@ -51,14 +39,13 @@ public class Robot extends TimedRobot {
         CommandScheduler.getInstance().run();
         double voltage = RobotController.getBatteryVoltage();
         SmartDashboard.putNumber("Robot/BatteryVoltage", voltage);
-        SmartDashboard.putBoolean("Robot/BatteryLow", voltage < 10.5);
+        SmartDashboard.putBoolean("Robot/BatteryLow",    voltage < 10.5);
     }
 
     @Override
     public void disabledInit() {
         m_robotContainer.limelightSubsystem.setAutoMode(false);
-        m_robotContainer.limelightSubsystem.setRearLEDsOff();
-        m_robotContainer.limelightSubsystem.setFrontLEDsOff();
+        m_robotContainer.limelightSubsystem.setLEDsOff();
         stopSignalLogger();
     }
 
@@ -72,8 +59,7 @@ public class Robot extends TimedRobot {
         m_robotContainer.limelightSubsystem.setVisionUpdatesEnabled(true);
 
         // Attempt to hard-reset the starting pose from LL4 vision before auto runs.
-        // Requires at least 2 tags within 3.5 m. Falls back to the PathPlanner
-        // starting pose if the reset fails (too few tags, tags too far, etc.).
+        // Falls back to the PathPlanner starting pose if the reset fails.
         m_robotContainer.limelightSubsystem.resetPoseFromVision();
 
         m_autonomousCommand = m_robotContainer.getAutonomousCommand();
@@ -86,18 +72,20 @@ public class Robot extends TimedRobot {
     public void autonomousPeriodic() {}
 
     @Override
-public void teleopInit() {
-    m_robotContainer.limelightSubsystem.setAutoMode(false);
-    m_robotContainer.limelightSubsystem.setVisionUpdatesEnabled(true);
+    public void teleopInit() {
+        m_robotContainer.limelightSubsystem.setAutoMode(false);
+        m_robotContainer.limelightSubsystem.setVisionUpdatesEnabled(true);
 
-    if (m_autonomousCommand != null) {
-        m_autonomousCommand.cancel();
-        // Reseed field-centric heading from the pose auto left us at
-        m_robotContainer.drivetrain.seedFieldCentric();
-    } else {
-        m_robotContainer.limelightSubsystem.resetPoseFromVision();
+        if (m_autonomousCommand != null) {
+            m_autonomousCommand.cancel();
+            // Reseed field-centric heading from the pose auto left us at
+            // so the driver doesn't need to press the reset button
+            m_robotContainer.drivetrain.seedFieldCentric();
+        } else {
+            // No auto ran — seed pose from vision so jump filter doesn't reject measurements
+            m_robotContainer.limelightSubsystem.resetPoseFromVision();
+        }
     }
-}
 
     @Override
     public void teleopPeriodic() {}

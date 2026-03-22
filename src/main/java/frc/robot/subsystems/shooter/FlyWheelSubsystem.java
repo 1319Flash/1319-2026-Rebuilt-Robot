@@ -43,8 +43,6 @@ public class FlywheelSubsystem extends SubsystemBase {
     // PID / FF gains — tune feedforward (kS, kV, kA) before kP
     // See Phase 2 tuning document for step-by-step procedure
     private static final double kP = 0.5;  // proportional gain
-    private static final double kI = 0.0;  // integral (leave at 0)
-    private static final double kD = 0.0;  // derivative (leave at 0)
     private static final double kS = 0.2;  // static friction voltage
     private static final double kV = 0.133; // voltage per RPS
     private static final double kA = 0.01;  // voltage per RPS/s acceleration
@@ -59,11 +57,11 @@ public class FlywheelSubsystem extends SubsystemBase {
 
     // Velocity bounds — clamped output of the model
     private static final double kMinVelocityRps = 30.0;
-    private static final double kMaxVelocityRps = 75.0;
+    private static final double kMaxVelocityRps = 90.0;
 
     // isAtSpeed() tolerance and auto-only safety timeout
     private static final double kVelocityToleranceRps  = 2.0;  // RPS
-    private static final double kAtSpeedTimeoutSeconds = 3.0;  // seconds
+    private static final double kAtSpeedTimeoutSeconds = 5.0;  // seconds
 
     // Current commanded velocity — tracked to prevent isAtSpeed() being true when stopped
     private double m_targetVelocity = 0.0;
@@ -80,8 +78,8 @@ public class FlywheelSubsystem extends SubsystemBase {
         TalonFXConfiguration config = new TalonFXConfiguration();
 
         config.Slot0.kP = kP;
-        config.Slot0.kI = kI;
-        config.Slot0.kD = kD;
+        config.Slot0.kI = 0;
+        config.Slot0.kD = 0;
         config.Slot0.kS = kS;
         config.Slot0.kV = kV;
         config.Slot0.kA = kA;
