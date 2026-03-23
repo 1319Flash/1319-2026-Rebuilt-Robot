@@ -25,7 +25,7 @@ public class LimelightSubsystem extends SubsystemBase {
 
     // Proportional gain for tx-based rotation alignment (right bumper command)
     // Tune on carpet: increase if robot doesn't rotate, decrease if it oscillates
-    private static final double kPAim = 0.06;
+    private static final double kPAim = 0.035;
 
     // -------------------------------------------------------------------------
     // Pose rejection thresholds — loosened for 2026 field limited tag visibility
