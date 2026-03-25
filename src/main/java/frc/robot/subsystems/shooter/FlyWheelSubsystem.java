@@ -42,10 +42,10 @@ public class FlywheelSubsystem extends SubsystemBase {
 
     // PID / FF gains — tune feedforward (kS, kV, kA) before kP
     // See Phase 2 tuning document for step-by-step procedure
-    private static final double kP = 0;  // proportional gain
+    private static final double kP = 0.25;  // proportional gain
     private static final double kS = 0.2;  // static friction voltage
-    private static final double kV = .11; // voltage per RPS
-    private static final double kA = 0.01;  // voltage per RPS/s acceleration
+    private static final double kV = 0.114; // voltage per RPS
+    private static final double kA = 0.03;  // voltage per RPS/s acceleration
 
     // Current limits — protects motors under stall or during jams
     private static final double kStatorCurrentLimit = 80.0; // amps
