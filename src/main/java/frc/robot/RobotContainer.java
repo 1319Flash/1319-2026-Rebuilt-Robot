@@ -3,7 +3,6 @@ package frc.robot;
 import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
-import static edu.wpi.first.units.Units.Value;
 
 import java.util.Set;
 
@@ -15,7 +14,6 @@ import com.pathplanner.lib.commands.FollowPathCommand;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.Relay;
-import edu.wpi.first.wpilibj.Relay.Value;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -25,7 +23,6 @@ import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.robot.commands.AprilTagAlignCommand;
 import frc.robot.generated.TunerConstants;
-import frc.robot.subsystems.ClimberSubsystem;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.IntakeSubsystem;
 import frc.robot.subsystems.limelight.LimelightSubsystem;
@@ -81,7 +78,6 @@ public class RobotContainer {
     public final LimelightSubsystem      limelightSubsystem = new LimelightSubsystem();
     public final FlywheelSubsystem       flywheelSubsystem  = new FlywheelSubsystem();
     public final UptakeSubsystem         uptakeSubsystem    = new UptakeSubsystem();
-    public final ClimberSubsystem        climberSubsystem   = new ClimberSubsystem();
     public final IntakeSubsystem         intakeSubsystem    = new IntakeSubsystem();
 
     // Telemetry
@@ -138,18 +134,12 @@ public class RobotContainer {
             )
         );
 
-        // Climb — toggles the climber solenoid
-        NamedCommands.registerCommand("Climb",
-            climberSubsystem.toggleCommand()
-        );
-
-        // ExtendIntake — always deploys the intake regardless of current state.
-        // Use extendCommand() not toggleCommand() so this is idempotent in auto.
+        // DeployIntake — drives pivot to deployed position, waits for limit switch
         NamedCommands.registerCommand("ExtendIntake",
-            intakeSubsystem.extendCommand()
+            intakeSubsystem.deployCommand()
         );
 
-        // IntakeBalls — runs intake motor.
+        // IntakeBalls — runs intake roller.
         // Use as an event zone in PathPlanner so it runs only while the robot
         // is inside the intake zone and stops automatically when the zone ends.
         NamedCommands.registerCommand("IntakeBalls",
@@ -210,19 +200,17 @@ public class RobotContainer {
         );
 
         // SysId — Back/Start + Y/X for translation characterization
-        // Run these to get kS and kV for drive motors via the SysId GUI
         m_driverController.back().and(m_driverController.y()).whileTrue(drivetrain.sysIdDynamic(Direction.kForward));
         m_driverController.back().and(m_driverController.x()).whileTrue(drivetrain.sysIdDynamic(Direction.kReverse));
         m_driverController.start().and(m_driverController.y()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kForward));
         m_driverController.start().and(m_driverController.x()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kReverse));
 
-        // A — reset field-centric heading (point robot's current heading as "forward")
+        // A — reset field-centric heading
         m_driverController.a().onTrue(drivetrain.runOnce(drivetrain::seedFieldCentric));
 
         drivetrain.registerTelemetry(m_telemetry::telemeterize);
 
-        // Right bumper — AprilTag rotation alignment using LL2 tx
-        // Driver retains full translation control. Only rotation is automated.
+        // Right bumper — AprilTag rotation alignment
         m_driverController.rightBumper().whileTrue(
             new AprilTagAlignCommand(
                 drivetrain,
@@ -236,7 +224,6 @@ public class RobotContainer {
         );
 
         // Back + Left bumper — cut CANivore power to recover from brownout
-        // Hold both simultaneously to avoid accidental triggering
         m_driverController.back().and(m_driverController.leftBumper())
             .onTrue(Commands.runOnce(() -> m_canivoreRelay.set(Relay.Value.kOff)));
 
@@ -248,8 +235,7 @@ public class RobotContainer {
         // Operator controller
         // -------------------------------------------------------------------------
 
-        // Right trigger — distance-based shot using getBestDistanceToTarget()
-        // No timeout on waitUntilAtSpeed() — driver releases button to cancel.
+        // Right trigger — distance-based shot, no timeout — driver releases to cancel
         m_operatorController.rightTrigger().whileTrue(
             Commands.sequence(
                 Commands.defer(() -> {
@@ -287,23 +273,23 @@ public class RobotContainer {
                 )
             );
 
-        // Left trigger — run intake to collect a ball
+        // Left trigger — run intake roller to collect a ball
         m_operatorController.leftTrigger()
             .whileTrue(intakeSubsystem.runCommand())
             .onFalse(intakeSubsystem.stopCommand());
 
-        // Back — manual intake reverse for unjamming
+        // Back — manual intake roller reverse for unjamming
         m_operatorController.back()
             .onTrue(intakeSubsystem.reverseCommand())
             .onFalse(intakeSubsystem.stopCommand());
 
-        // POV Up — toggle intake deploy/retract
+        // POV Up — deploy intake pivot
         m_operatorController.povUp()
-            .onTrue(intakeSubsystem.toggleCommand());
+            .onTrue(intakeSubsystem.deployCommand());
 
-        // Start — toggle climber
-        m_operatorController.start()
-            .onTrue(climberSubsystem.toggleCommand());
+        // POV Down — retract intake pivot
+        m_operatorController.povDown()
+            .onTrue(intakeSubsystem.retractCommand());
     }
 
     public Command getAutonomousCommand() {

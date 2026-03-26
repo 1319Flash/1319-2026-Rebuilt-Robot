@@ -4,131 +4,193 @@ import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
-import edu.wpi.first.wpilibj.DoubleSolenoid;
-import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
-import edu.wpi.first.wpilibj.PneumaticsModuleType;
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
-/** Controls the intake motor (Falcon 500) and pneumatic deploy cylinder. */
+/**
+ * Controls the intake roller motor and the Kraken pivot motor.
+ *
+ * The pivot motor rotates the intake in and out. Two limit switches on the
+ * RIO DIO ports define the hard stops:
+ *   - Forward limit (deployed)  — stops the pivot when fully extended
+ *   - Reverse limit (retracted) — stops the pivot when fully retracted
+ *
+ * The pivot motor is stopped immediately when either limit switch is triggered.
+ * This is checked every loop in periodic() as a safety net in addition to
+ * the software commands that stop the motor on command completion.
+ */
 public class IntakeSubsystem extends SubsystemBase {
-    private final TalonFX        m_intakeMotor;
-    private final DoubleSolenoid m_intakeSolenoid;
+    private final TalonFX    m_rollerMotor;
+    private final TalonFX    m_pivotMotor;
+    private final DigitalInput m_forwardLimit;
+    private final DigitalInput m_reverseLimit;
 
-    // Non-drivetrain motors are on the RIO CAN bus ("")
-    private static final int    kIntakeMotorId           = 9;
-    private static final String kCanBus                  = "";
+    // -------------------------------------------------------------------------
+    // CAN IDs — non-drivetrain motors are on the RIO CAN bus ("")
+    // -------------------------------------------------------------------------
+    private static final int    kRollerMotorId        = 9;
+    private static final int    kPivotMotorId         = 13; // update to your actual CAN ID
+    private static final String kCanBus               = "";
 
-    private static final double kIntakeSpeed             = -0.80;
+    // -------------------------------------------------------------------------
+    // DIO port numbers — update to match your wiring on the RIO
+    // -------------------------------------------------------------------------
+    private static final int kForwardLimitPort = 0; // deployed limit switch
+    private static final int kReverseLimitPort = 1; // retracted limit switch
 
-    // Pneumatic channel IDs on the REV PH
-    private static final int    kSolenoidForwardChannel  = 2;
-    private static final int    kSolenoidReverseChannel  = 3;
+    // -------------------------------------------------------------------------
+    // Motor speeds
+    // -------------------------------------------------------------------------
+    private static final double kRollerSpeed      =  -.8;
+    private static final double kPivotDeploySpeed =  0.3; // positive = deploying
+    private static final double kPivotRetractSpeed= -0.3; // negative = retracting
 
-    // Current limits — protect motor during stall
-    private static final double kStatorCurrentLimit      = 80.0;
-    private static final double kSupplyCurrentLimit      = 40.0;
+    // -------------------------------------------------------------------------
+    // Current limits
+    // -------------------------------------------------------------------------
+    private static final double kRollerStatorLimit = 80.0;
+    private static final double kRollerSupplyLimit = 40.0;
+    private static final double kPivotStatorLimit  = 40.0; // lower — pivot is position holding
+    private static final double kPivotSupplyLimit  = 30.0;
 
     public IntakeSubsystem() {
-        m_intakeMotor    = new TalonFX(kIntakeMotorId, kCanBus);
-        m_intakeSolenoid = new DoubleSolenoid(
-            PneumaticsModuleType.CTREPCM,
-            kSolenoidForwardChannel,
-            kSolenoidReverseChannel
-        );
+        m_rollerMotor  = new TalonFX(kRollerMotorId, kCanBus);
+        m_pivotMotor   = new TalonFX(kPivotMotorId,  kCanBus);
+        m_forwardLimit = new DigitalInput(kForwardLimitPort);
+        m_reverseLimit = new DigitalInput(kReverseLimitPort);
 
-        // Start retracted so intake is up at robot enable
-        m_intakeSolenoid.set(Value.kReverse);
-
-        configureMotor();
+        configureRoller();
+        configurePivot();
     }
 
-    private void configureMotor() {
+    private void configureRoller() {
         TalonFXConfiguration config = new TalonFXConfiguration();
-
-        config.MotorOutput.NeutralMode = NeutralModeValue.Brake;
-
-        config.CurrentLimits.StatorCurrentLimit       = kStatorCurrentLimit;
+        config.MotorOutput.NeutralMode             = NeutralModeValue.Brake;
+        config.CurrentLimits.StatorCurrentLimit       = kRollerStatorLimit;
         config.CurrentLimits.StatorCurrentLimitEnable = true;
-        config.CurrentLimits.SupplyCurrentLimit       = kSupplyCurrentLimit;
+        config.CurrentLimits.SupplyCurrentLimit       = kRollerSupplyLimit;
         config.CurrentLimits.SupplyCurrentLimitEnable = true;
-
-        m_intakeMotor.getConfigurator().apply(config);
+        m_rollerMotor.getConfigurator().apply(config);
     }
+
+    private void configurePivot() {
+        TalonFXConfiguration config = new TalonFXConfiguration();
+        // Brake mode holds the intake in position when pivot motor is stopped
+        config.MotorOutput.NeutralMode             = NeutralModeValue.Brake;
+        config.CurrentLimits.StatorCurrentLimit       = kPivotStatorLimit;
+        config.CurrentLimits.StatorCurrentLimitEnable = true;
+        config.CurrentLimits.SupplyCurrentLimit       = kPivotSupplyLimit;
+        config.CurrentLimits.SupplyCurrentLimitEnable = true;
+        m_pivotMotor.getConfigurator().apply(config);
+    }
+
+    // =========================================================================
+    // Periodic — limit switch safety enforcement
+    // =========================================================================
 
     @Override
     public void periodic() {
-        SmartDashboard.putBoolean("Intake/Extended", isExtended());
-        SmartDashboard.putNumber("Intake/Velocity", getVelocity());
-    }
+        // Hard stop the pivot if either limit switch is triggered.
+        // Limit switches return false when triggered (normally closed circuit).
+        // Change to !m_forwardLimit.get() if using normally open switches.
+        if (!m_forwardLimit.get() || !m_reverseLimit.get()) {
+            stopPivot();
+        }
 
-    // =========================================================================
-    // Private motor helpers
-    // =========================================================================
-
-    private void setSpeed(double speed) {
-        m_intakeMotor.set(speed);
-    }
-
-    private void stop() {
-        m_intakeMotor.set(0);
+        SmartDashboard.putBoolean("Intake/Deployed",      isDeployed());
+        SmartDashboard.putBoolean("Intake/Retracted",     isRetracted());
+        SmartDashboard.putNumber("Intake/RollerVelocity", m_rollerMotor.getVelocity().getValueAsDouble());
     }
 
     // =========================================================================
     // Public getters
     // =========================================================================
 
-    /** Returns true if the intake cylinder is currently extended (deployed). */
-    public boolean isExtended() {
-        return m_intakeSolenoid.get() == Value.kForward;
+    /** Returns true when the forward (deployed) limit switch is triggered. */
+    public boolean isDeployed() {
+        return !m_forwardLimit.get();
     }
 
-    public double getVelocity() {
-        return m_intakeMotor.getVelocity().getValueAsDouble();
+    /** Returns true when the reverse (retracted) limit switch is triggered. */
+    public boolean isRetracted() {
+        return !m_reverseLimit.get();
     }
 
     // =========================================================================
-    // Commands — pneumatic
+    // Private motor helpers
     // =========================================================================
 
-    /** Toggles the intake cylinder between extended and retracted. */
-    public Command toggleCommand() {
-        return Commands.runOnce(() -> m_intakeSolenoid.toggle(), this);
+    private void setPivotSpeed(double speed) {
+        m_pivotMotor.set(speed);
     }
 
-    /** Extends (deploys) the intake. */
-    public Command extendCommand() {
-        return Commands.runOnce(() -> m_intakeSolenoid.set(Value.kForward), this);
+    private void stopPivot() {
+        m_pivotMotor.set(0);
     }
 
-    /** Retracts the intake. */
+    private void setRollerSpeed(double speed) {
+        m_rollerMotor.set(speed);
+    }
+
+    private void stopRoller() {
+        m_rollerMotor.set(0);
+    }
+
+    // =========================================================================
+    // Commands — pivot
+    // =========================================================================
+
+    /**
+     * Deploys the intake by running the pivot motor until the forward limit switch
+     * triggers, then stops. Safe to call if already deployed.
+     */
+    public Command deployCommand() {
+        return Commands.run(() -> setPivotSpeed(kPivotDeploySpeed), this)
+            .until(this::isDeployed)
+            .finallyDo(interrupted -> stopPivot());
+    }
+
+    /**
+     * Retracts the intake by running the pivot motor until the reverse limit switch
+     * triggers, then stops. Safe to call if already retracted.
+     */
     public Command retractCommand() {
-        return Commands.runOnce(() -> m_intakeSolenoid.set(Value.kReverse), this);
+        return Commands.run(() -> setPivotSpeed(kPivotRetractSpeed), this)
+            .until(this::isRetracted)
+            .finallyDo(interrupted -> stopPivot());
+    }
+
+    /**
+     * Toggles the intake between deployed and retracted based on current state.
+     * Deploys if retracted, retracts if deployed or in between.
+     */
+    public Command toggleCommand() {
+        return Commands.either(
+            retractCommand(),
+            deployCommand(),
+            this::isDeployed
+        );
     }
 
     // =========================================================================
-    // Commands — motor
+    // Commands — roller
     // =========================================================================
 
-    /** Runs the intake at full speed. */
+    /** Runs the intake roller at full speed. */
     public Command runCommand() {
-        return runOnce(() -> setSpeed(kIntakeSpeed));
+        return runOnce(() -> setRollerSpeed(kRollerSpeed));
     }
 
-    /** Stops the intake. */
+    /** Stops the intake roller. */
     public Command stopCommand() {
-        return runOnce(this::stop);
+        return runOnce(this::stopRoller);
     }
 
-    /** Reverses the intake for unjamming. */
+    /** Reverses the intake roller for unjamming. */
     public Command reverseCommand() {
-        return runOnce(() -> setSpeed(-kIntakeSpeed));
-    }
-
-    /** Runs the intake at a custom speed. */
-    public Command runAtSpeed(double speed) {
-        return runOnce(() -> setSpeed(speed));
+        return runOnce(() -> setRollerSpeed(-kRollerSpeed));
     }
 }
